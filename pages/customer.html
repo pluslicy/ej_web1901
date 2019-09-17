@@ -1,3 +1,175 @@
-<div class="customer">
-	顾客管理
+<script>
+		var baseURL = "http://134.175.100.63:6677"
+		// 重载数据
+		function reloadData(){
+			// 1. 调用ajax查询所有的顾客信息
+			var url = baseURL+"/customer/findAll"
+			$.get(url,function(result){
+				// 1) 清空tbody中的内容
+				$("#customer_tbl tbody").empty();
+				// 2) 遍历result每遍历一个元素追加一个tr到tbody中
+				result.data.forEach(function(item){
+					$(`<tr>
+						<td > <input type="checkbox" value="`+item.id+`"> </td>
+						<td>`+item.realname+`</td>
+						<td>`+item.password+`</td>
+						<td>`+item.telephone+`</td>
+						<td> 
+							<a class="btn_upd" href="">编辑</a>
+							<a class="btn_del" href="">删除</a>
+							<a class="btn_details" href="">详情</a>
+						</td>
+					</tr>`).appendTo($("#customer_tbl tbody"));
+				});
+			})			
+		}
+
+		// 提交事件处理函数
+		function handlerSubmit(event){
+			// 1) 获取表单元素
+			var id = $("#customer_form input[name=id]").val();
+			var realname = $("#customer_form input[name=realname]").val();
+			var password = $("#customer_form input[name=password]").val();
+			var telephone = $("#customer_form input[name=telephone]").val();
+			// 2) 进行表单验证
+			// 3) 通过ajax进行交互
+			var url = baseURL + "/customer/saveOrUpdate"
+			var data = {
+				id,
+				realname,
+				password,
+				telephone
+			}
+			$.post(url,data,function(result){
+				// 成功消息提示
+				alert(result.message);
+				// 重载数据
+				reloadData();
+				// 重置表单
+				$("#customer_form input[name=id]").val("");
+				$("#customer_form input[name=realname]").val("");
+				$("#customer_form input[name=password]").val("");
+				$("#customer_form input[name=telephone]").val("");
+			});
+			// 阻止表单的默认提交
+			event.preventDefault();
+		}
+
+		// 添加按钮的事件处理函数
+		function addHandler(){
+			// 让表单显示出来
+			$("#customer_form").toggle();
+			
+		}
+
+		// 更新删除按钮的事件处理函数
+		function updOrDelHandler(event){
+			console.log(this);
+			
+			switch(this.className){
+				case "btn_upd":
+					// 1. 获取当前行的数据
+					var id = $(this).parents("tr").children().eq(0).find("input").val();
+					var realname = $(this).parents("tr").children().eq(1).text();
+					var password = $(this).parents("tr").children().eq(2).text();;
+					var telephone = $(this).parents("tr").children().eq(3).text();
+					// 2. 将当前行的数据设置到表单中供用户修改,id
+					$("#customer_form input[name=id]").val(id);
+					$("#customer_form input[name=realname]").val(realname);
+					$("#customer_form input[name=password]").val(password);
+					$("#customer_form input[name=telephone]").val(telephone);
+					break;
+				case "btn_del":
+					// 1. 获取要删除行的id
+					var id = $(this).parents("tr").children().eq(0).find("input").val();
+					// 2. 通过ajax调用后台接口删除该行元素
+					var url = baseURL+"/customer/deleteById?id="+id;
+					$.get(url,function(result){
+						alert(result.message);
+						reloadData();
+					});
+					break;
+				case "btn_details":
+
+					break;
+			}
+			// 阻止a标签的默认行为
+			event.preventDefault();
+		}
+		// 批量删除事件处理函数
+		function batchDeleteHandler(){
+			// 1. 获取id
+			var ids = $("#customer_tbl input[type=checkbox]:checked").map(function(index,item){
+				return item.value;
+			}).toArray();
+			if(ids.length !== 0){
+				// 将ids转换为查询字符串
+				var data = ""
+				for(var key in ids){
+					var id = ids[key];
+					if(+key === 0){
+						data += "ids="+id
+					} else {
+						data += "&ids="+id
+					}
+				}
+				// 2. 交互
+				var url = baseURL+"/customer/batchDelete";
+				$.post(url,data,function(result){
+					alert(result.message);
+					reloadData();
+				});
+			} else {
+				alert("请选择您要删除的行");
+			}
+
+		}
+		// 文档加载完毕后 
+		$(function(){
+			// 1. 调用重载数据，渲染表格
+			reloadData();
+			// 2. 为表单绑定提交事件
+			$("#customer_form").on("submit",handlerSubmit);
+			// 3. 为编辑和删除按钮绑定事件【事件代理】
+			$("#customer_tbl tbody").on("click","a",updOrDelHandler);
+			// 4. 为添加按钮绑定事件处理函数
+			$("#btn_add").on("click",addHandler);
+			// 5. 为批量删除按钮绑定事件处理函数
+			$("#btn_batch_delete").on("click",batchDeleteHandler);
+		});
+
+</script>
+
+<div class="customer">	
+	<!-- 按钮组 -->
+	<div class="btns mb-2">
+		<div class="btn btn-primary" id="btn_add">添加</div>
+		<div class="btn btn-danger" id="btn_batch_delete">批量删除</div>
+	</div>
+	<!-- / 按钮组结束 -->
+	<!-- 表单 -->
+	<form id="customer_form" class="mb-1">
+		<input type="hidden" name="id">
+		用户名 <input type="text" name="realname">
+		密码 	<input type="password" name="password">
+		手机号 <input type="text" name="telephone">
+		<input class="btn btn-primary" type="submit" value="提交">
+	</form>
+	<!-- / 表单 -->
+	<!-- 表格 -->
+	<table class="table" id="customer_tbl">
+		<thead class="text-center">
+			<tr>
+				<td width="60px">编号</td>
+				<td>姓名</td>
+				<td>密码</td>
+				<td>手机号</td>
+				<td width="150px">操作</td>
+			</tr>
+		</thead>
+		<tbody>
+			
+		</tbody>
+	</table>
+	<!-- / 表格 -->
 </div>
