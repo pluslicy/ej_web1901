@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>e洁家政服务平台</title>
+	<link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.css" rel="stylesheet">
+	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+	<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.js"></script>
+	<style>
+		html,body,#app,#app>.row {
+			height: 100%;
+		}
+		ul {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+		.left_nav {
+			text-align: center;
+		}
+		.left_nav .title {
+			font-size: 18px;
+			color: #fff;
+			font-weight: bold;
+			line-height: 50px;
+		}
+		.left_nav a {
+			color: #ededed;
+		}
+		.left_nav > ul > li {
+			line-height: 2.5em;
+			border-bottom: 1px solid #ededed
+		}
+		.right_content {
+
+		}
+		.right_content > .top {
+			height: 50px;
+			border-bottom: 1px solid #ccc;
+			box-shadow: 1px 0 3px #333;
+		}
+	</style>
+	<script>
+		$(function(){
+			$(".left_nav > ul.menu").on("click","li",function(){
+				var url = $(this).attr("url");
+				// 将url指定的页面加载到content中进行显示
+				$("#content").load(url);
+			});
+		});
+	</script>
+</head>
+<body>
+	<!-- 容器 -->
+	<div class="container-fluid" id="app">
+		<div class="row">
+			<!-- 左侧导航 -->
+			<div class="col-2 left_nav bg-dark">
+				<div class="title">e洁家政服务平台</div>
+				<ul class="menu">
+					<li url="./pages/customer.html"><a href="javascript:void(0)">顾客管理</a></li>
+					<li url="./pages/category.html"><a href="javascript:void(0)">栏目管理</a></li>
+					<li url="./pages/product.html"><a href="javascript:void(0)">产品管理</a></li>
+					<li url="./pages/order.html"><a href="javascript:void(0)">订单管理</a></li>
+					<li url="./pages/waiter.html"><a href="javascript:void(0)">员工管理</a></li>
+				</ul>
+			</div>
+			<!-- /左侧导航 -->
+			<!-- 右侧内容 -->
+			<div class="col-10 right_content" >
+				<div class="top" style="margin: 0 -15px"></div>
+				<div id="content">
+					
+				</div>
+			</div>
+			<!-- /右侧内容 -->
+		</div>
+	</div>
+	<!-- / 容器 -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
